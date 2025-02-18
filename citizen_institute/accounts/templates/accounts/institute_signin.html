@@ -1,0 +1,8 @@
+<form method="post">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password">
+    <button type="submit">Login</button>
+</form>
+
+<a href="{% url 'institute_signup' %}">Don't have an account? Sign up</a>

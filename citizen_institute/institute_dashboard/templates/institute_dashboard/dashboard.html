@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Filter Database</h2>
+
+    <form id="filterForm" method="post">
+        {% csrf_token %}
+        
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="blood_type">Blood Type:</label>
+        <input type="text" id="blood_type" name="blood_type" required>
+
+        <button type="submit">Submit</button> <br> <br>
+
+
+        <label for="urgent">Add this case to the urgent list:</label>
+        <button type="button" id="urgent">Add to urgent list</button>
+    </form>
+
+    <h3>Results:</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>City</th>
+                <th>Address</th>
+                <th>Blood Type</th>
+                <th>Phone Number</th>
+            </tr>
+        </thead>
+        <tbody id="resultsTable">
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById("filterForm").addEventListener("submit", function(event) {
+            event.preventDefault();  // Prevent normal form submission
+
+            const formData = {
+                city: document.getElementById("city").value.trim(),
+                address: document.getElementById("address").value.trim(),
+                blood_type: document.getElementById("blood_type").value.trim()
+            };
+
+            if (!formData.city || !formData.address || !formData.blood_type) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // Get CSRF token from the form
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch("/institute/filter_citizens/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const tableBody = document.getElementById("resultsTable");
+                tableBody.innerHTML = ""; // Clear previous results
+
+                if (data.length === 0) {
+                    tableBody.innerHTML = "<tr><td colspan='6'>No results found.</td></tr>";
+                    return;
+                }
+
+                data.forEach(row => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${row.first_name}</td>
+                        <td>${row.last_name}</td>
+                        <td>${row.city}</td>
+                        <td>${row.address}</td>
+                        <td>${row.blood_type}</td>
+                        <td>${row.phone_number}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again.");
+            });
+        });
+
+        document.getElementById("urgent").addEventListener("click", function(event) {
+            event.preventDefault();  
+            window.location.href = "{% url 'description_case' %}";
+
+        });
+    </script>
+</body>
+</html>

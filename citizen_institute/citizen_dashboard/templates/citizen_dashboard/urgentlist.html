@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urgent Cases</title>
+</head>
+<body>
+    <h2>Urgent Cases</h2>
+    <table border="1">
+        <tr>
+            <th>Type of Case</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Blood Type</th>
+            <th>City</th>
+            <th>Address</th>
+        </tr>
+        {% for case in urgent_cases %}
+        <tr>
+            <td>{{ case.type_case }}</td>
+            <td>{{ case.first_name }}</td>
+            <td>{{ case.last_name }}</td>
+            <td>{{ case.blood_type }}</td>
+            <td>{{ case.city }}</td>
+            <td>{{ case.address }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
