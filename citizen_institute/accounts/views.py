@@ -70,12 +70,22 @@ class CitizenSigninView(View):
             citizen = Citizen.objects.get(email=email)
             if check_password(password, citizen.password):
                 messages.success(request, "Login successful!")
-                return redirect('dashboard')
+                return render(request, 'citizen_dashboard/cdashboard.html', {
+                    'first_name': citizen.first_name,
+                    'last_name': citizen.last_name
+                })
             else:
                 messages.error(request, "Invalid credentials!")
         except Citizen.DoesNotExist:
             messages.error(request, "User not found!")
         return redirect('citizen_signin')
+    
+class CitizenDashboardView(View):
+    def get(self, request):
+        first_name = request.session.get('first_name', 'Guest')
+        last_name = request.session.get('last_name', '')
+        return render(request, 'citizen_dashboard/cdashboard.html', {'first_name': first_name, 'last_name': last_name})
+
 
 class InstituteSignupView(View):
     def get(self, request):
@@ -119,12 +129,19 @@ class InstituteSigninView(View):
             institute = Institute.objects.get(email=email)
             if check_password(password, institute.password):
                 messages.success(request, "Login successful!")
-                return redirect('institute_dashboard')
+                return render(request, 'institute_dashboard/dashboard.html', {
+                    'name': institute.name,    
+                })
             else:
                 messages.error(request, "Invalid credentials!")
         except Institute.DoesNotExist:
             messages.error(request, "User not found!")
         return redirect('institute_signin')
+    
+class InstituteDashboardView(View):
+    def get(self, request):
+        name = request.session.get('name', 'Guest')
+        return render(request, 'institute_dashboard/dashboard.html', {'name': name})
 
 ### REST API VIEWS ###
 

@@ -1,4 +1,6 @@
 from django.urls import path 
+from .views import CitizenDashboardView
+from .views import InstituteDashboardView
 from .views import IndexView
 from .views import (
     IndexView,  # Add index view
@@ -15,6 +17,9 @@ urlpatterns = [
     path('citizen/signin/', CitizenSigninView.as_view(), name='citizen_signin'),
     path('institute/signup/', InstituteSignupView.as_view(), name='institute_signup'),
     path('institute/signin/', InstituteSigninView.as_view(), name='institute_signin'),
+    path('dashboard/', CitizenDashboardView.as_view(), name='dashboard'),
+    path('dashboard/', InstituteDashboardView.as_view(), name='dashboard'),
+
 
     # API endpoints (kept for reference)
     path('api/citizen/signup/', CitizenSignupAPI.as_view(), name='api_citizen_signup'),

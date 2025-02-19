@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-    <h1>Welcome to Citizen Dashboard</h1>
+    <h1>Welcome, {{ first_name }} {{ last_name }}</h1>
     <p>Select an option:</p>
 
     <div class="button-container">
@@ -41,9 +41,6 @@
             <button type="submit" class="option-btn">Reserve Appointment for Blood Type Check</button>
         </form>
         
-
-        
-
         <form action="/citizen/blood-donation/" method="GET">
             <button type="submit" class="option-btn">Reserve Appointment for Blood Donation</button>
         </form>
