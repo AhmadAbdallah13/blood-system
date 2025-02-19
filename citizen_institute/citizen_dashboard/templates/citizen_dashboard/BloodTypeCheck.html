@@ -20,7 +20,7 @@
         <option value="">Select Hospital</option>
     </select>
 
-    <label for="appointment_date">Select Date:</label>
+    <label for="appointment_date">Select Date and Time:</label>
     <input type="date" id="appointment_date" name="appointment_date" required>
 
     <button type="submit">Reserve Appointment</button>
@@ -49,6 +49,15 @@
             });
         }
     }
+
+    // Prevent past date and time selection
+    document.addEventListener("DOMContentLoaded", function () {
+        const appointmentInput = document.getElementById("appointment_date");
+        const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    
+        // Set the minimum selectable date to today
+        appointmentInput.min = today;
+    });
 </script>
 
 {% if messages %}
