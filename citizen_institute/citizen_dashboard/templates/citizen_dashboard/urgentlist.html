@@ -4,28 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Urgent Cases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #7F0000, #FF4C4C);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 80%;
+            max-width: 900px;
+            color: #7F0000;
+        }
+        h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #7F0000;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #7F0000;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f8d7da;
+        }
+    </style>
 </head>
 <body>
-    <h2>Urgent Cases</h2>
-    <table border="1">
-        <tr>
-            <th>Type of Case</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Blood Type</th>
-            <th>City</th>
-            <th>Address</th>
-        </tr>
-        {% for case in urgent_cases %}
-        <tr>
-            <td>{{ case.type_case }}</td>
-            <td>{{ case.first_name }}</td>
-            <td>{{ case.last_name }}</td>
-            <td>{{ case.blood_type }}</td>
-            <td>{{ case.city }}</td>
-            <td>{{ case.address }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container">
+        <h2>Urgent Cases</h2>
+        <table>
+            <tr>
+                <th>Type of Case</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Blood Type</th>
+                <th>City</th>
+                <th>Address</th>
+            </tr>
+            {% for case in urgent_cases %}
+            <tr>
+                <td>{{ case.type_case }}</td>
+                <td>{{ case.first_name }}</td>
+                <td>{{ case.last_name }}</td>
+                <td>{{ case.blood_type }}</td>
+                <td>{{ case.city }}</td>
+                <td>{{ case.address }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 </body>
 </html>

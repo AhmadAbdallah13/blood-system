@@ -1,3 +1,50 @@
+<style>
+    body {
+        background: linear-gradient(to right, #ffcccc, #ff6666);
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    form {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 400px;
+    }
+    label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    input, select, button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    button {
+        background: #cc0000;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #990000;
+    }
+    p {
+        font-size: 14px;
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
 <form method="POST" action="{% url 'blood_donation_appointment' %}">
     {% csrf_token %}
 
@@ -31,12 +78,12 @@
         <option value="other disease">Other Disease</option>
         <option value="no">No</option>        
     </select>
-    <p id="health-warning" style="color: red; display: none;">You cannot donate due to health conditions.</p>
+    <p id="health-warning" style="display: none;">You cannot donate due to health conditions.</p>
 
     <label>Have you donated in the last 2 months?</label>
     <input type="radio" id="donated_yes" name="donated_last_two_months" value="true" onchange="validateDonation()"> Yes
     <input type="radio" id="donated_no" name="donated_last_two_months" value="false" onchange="validateDonation()"> No
-    <p id="donation-warning" style="color: red; display: none;">You cannot donate now. Minimum after 2 months.</p>
+    <p id="donation-warning" style="display: none;">You cannot donate now. Minimum after 2 months.</p>
 
     <label for="units">Select Number of Units:</label>
     <select id="units" name="donation_units">
@@ -75,9 +122,7 @@
     function updateHospitals() {
         const city = document.getElementById("city").value;
         const hospitalDropdown = document.getElementById("hospital");
-
         hospitalDropdown.innerHTML = '<option value="">Select Hospital</option>';
-
         if (city in hospitalOptions) {
             hospitalOptions[city].forEach(hospital => {
                 const option = document.createElement("option");
@@ -93,7 +138,6 @@
         const warningMessage = document.getElementById("donation-warning");
         const submitButton = document.getElementById("submit-btn");
         const unitsDropdown = document.getElementById("units");
-
         if (donatedYes.checked) {
             warningMessage.style.display = "block";
             submitButton.disabled = true;
@@ -109,7 +153,6 @@
         const chronicDisease = document.getElementById("chronic_disease").value;
         const warningMessage = document.getElementById("health-warning");
         const submitButton = document.getElementById("submit-btn");
-
         if (["heart disease", "cancer", "hypertension"].includes(chronicDisease)) {
             warningMessage.style.display = "block";
             submitButton.disabled = true;
@@ -119,11 +162,3 @@
         }
     }
 </script>
-
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
