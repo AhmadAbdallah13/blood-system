@@ -1,7 +1,133 @@
-<form method="POST">
-    {% csrf_token %}
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Sign In</button>
-</form>
-<a href="{% url 'citizen_signup' %}">Don't have an account? Sign up</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Donor Sign In</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f8d7da; /* Light red background */
+        }
+        .auth-container {
+            max-width: 400px;
+            padding: 2.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(199, 0, 13, 0.08);
+            margin: 2rem auto;
+            animation: fadeIn 0.5s ease-out;
+            text-align: center;
+        }
+        .form-title {
+            color: #c7000d;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #c7000d;
+            box-shadow: 0 0 0 2px rgba(199, 0, 13, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a4a4a;
+            font-weight: 500;
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: #c7000d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+        }
+        button:hover {
+            background: #a8000a;
+            transform: translateY(-1px);
+        }
+        .signup-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .signup-link:hover {
+            color: #c7000d;
+            text-decoration: underline;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 1.5rem;
+                margin: 1rem;
+                box-shadow: none;
+                border: 1px solid #eee;
+            }
+            input {
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 class="form-title">Blood Donor Sign In</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+        <a href="{% url 'citizen_signup' %}" class="signup-link">
+            New donor? Join our lifesaving community
+        </a>
+    </div>
+</body>
+</html>

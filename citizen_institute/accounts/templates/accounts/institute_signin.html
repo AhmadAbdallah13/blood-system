@@ -1,8 +1,98 @@
-<form method="post">
-    {% csrf_token %}
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password">
-    <button type="submit">Login</button>
-</form>
-
-<a href="{% url 'institute_signup' %}">Don't have an account? Sign up</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f8d7da; /* Light red background */
+        }
+        .container {
+            width: 400px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #c82333; /* Blood red color */
+            font-weight: 600;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f1f1f1;
+            color: #333;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        input::placeholder {
+            color: #777;
+        }
+        input:focus, select:focus {
+            background: #e6e6e6;
+            box-shadow: 0 0 8px rgba(200, 35, 51, 0.3);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #c82333;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #a71d2a;
+        }
+        a {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #c82333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
+        <a href="{% url 'institute_signup' %}">Don't have an account? Sign up</a>
+    </div>
+</body>
+</html>

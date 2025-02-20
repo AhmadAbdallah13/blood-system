@@ -4,13 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome</title>
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c7000d; /* Blood red */
+            --secondary: #8a010a; /* Darker blood red */
+            --accent: #ff4d4d; /* Bright red accent */
+            --dark: #2a0a0c; /* Dark maroon */
+            --light: #fff5f5; /* Soft pink background */
+        }
+    
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, var(--light) 0%, #ffe6e6 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+    
+        h1 {
+            color: var(--dark);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+    
+        h1::before {
+            content: '🩸';
+            font-size: 1.5em;
+            animation: pulse 1.5s infinite;
+        }
+    
+        .container {
+            display: grid;
+            gap: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(199, 0, 13, 0.1);
+            backdrop-filter: blur(10px);
+            transform: translateY(0);
+            animation: floatUp 0.8s ease-out;
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+    
+        .container::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 60px;
+            height: 60px;
+            background: url('data:image/svg+xml,<svg viewBox="0 0 24 24" fill="%23c7000d" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5C8.13 2.5 5 5.58 5 9.37c0 5.63 6.38 10.2 6.5 10.27.12-.07 6.5-4.64 6.5-10.27 0-3.79-3.13-6.87-7-6.87zm0 15.47c-1.67-1.59-5.5-5.55-5.5-9.1 0-3.09 2.52-5.6 5.5-5.6s5.5 2.51 5.5 5.6c0 3.55-3.83 7.51-5.5 9.1z"/><path d="M12 6.5c-1.93 0-3.5 1.57-3.5 3.5s1.57 3.5 3.5 3.5 3.5-1.57 3.5-3.5-1.57-3.5-3.5-3.5zm0 5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>');
+            opacity: 0.1;
+            z-index: -1;
+        }
+    
+        .link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 2rem;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(199, 0, 13, 0.1);
+            gap: 10px;
+        }
+    
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(199, 0, 13, 0.2);
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+        }
+    
+        .link-btn i {
+            font-size: 1.3em;
+        }
+    
+        /* Different colors for different user types */
+        .link-btn:nth-child(1),
+        .link-btn:nth-child(2) {
+            background: linear-gradient(45deg, #c7000d, #8a010a);
+        }
+    
+        .link-btn:nth-child(3),
+        .link-btn:nth-child(4) {
+            background: linear-gradient(45deg, #d93838, #8a010a);
+        }
+    
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    
+        @keyframes floatUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .container {
+                width: 85%;
+                padding: 1.5rem;
+            }
+            
+            .link-btn {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+    </head>
+    
 <body>
     <h1>Welcome! Choose an Option</h1>
-    <a href="{% url 'citizen_signin' %}">Citizen Login</a> | 
-    <a href="{% url 'citizen_signup' %}">Citizen Signup</a>
-    <br>
-    <a href="{% url 'institute_signin' %}">Institute Login</a> | 
-    <a href="{% url 'institute_signup' %}">Institute Signup</a>
+    <div class="container">
+        <a href="{% url 'citizen_signin' %}" class="link-btn">Citizen Login</a>
+        <a href="{% url 'citizen_signup' %}" class="link-btn">Citizen Signup</a>
+        <a href="{% url 'institute_signin' %}" class="link-btn">Institute Login</a>
+        <a href="{% url 'institute_signup' %}" class="link-btn">Institute Signup</a>
+    </div>
 </body>
 </html>

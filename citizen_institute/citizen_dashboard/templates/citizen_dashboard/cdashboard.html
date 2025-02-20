@@ -5,49 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citizen Dashboard</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
         body {
-            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #7F0000, #FF4C4C);
+            color: white;
             text-align: center;
-            margin: 50px;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 450px;
+            color: #7F0000;
+        }
+        h1 {
+            margin-bottom: 15px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+        p {
+            margin-bottom: 20px;
+            font-size: 16px;
         }
         .button-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
             gap: 15px;
         }
         .option-btn {
-            width: 350px;
-            padding: 15px;
+            width: 100%;
+            padding: 14px;
             font-size: 18px;
-            background-color: #007BFF;
+            font-weight: bold;
+            background: linear-gradient(90deg, #7F0000, #FF4C4C);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: transform 0.2s, background 0.3s;
         }
         .option-btn:hover {
-            background-color: #0056b3;
+            background: linear-gradient(90deg, #600000, #D43F3F);
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <h1>Welcome, {{ first_name }} {{ last_name }}</h1>
-    <p>Select an option:</p>
+    <div class="container">
+        <h1>Welcome, {{ first_name }} {{ last_name }}</h1>
+        <p>Select an option:</p>
 
-    <div class="button-container">
-        <form action="/citizen/blood-type-check/" method="GET">
-            <button type="submit" class="option-btn">Reserve Appointment for Blood Type Check</button>
-        </form>
-        
-        <form action="/citizen/blood-donation/" method="GET">
-            <button type="submit" class="option-btn">Reserve Appointment for Blood Donation</button>
-        </form>
+        <div class="button-container">
+            <form action="/citizen/blood-type-check/" method="GET">
+                <button type="submit" class="option-btn">Reserve Appointment for Blood Type Check</button>
+            </form>
+            
+            <form action="/citizen/blood-donation/" method="GET">
+                <button type="submit" class="option-btn">Reserve Appointment for Blood Donation</button>
+            </form>
 
-        <form action="/citizen/urgent-cases/" method="GET">
-            <button type="submit" class="option-btn">Urgent Cases</button>
-        </form>
+            <form action="/citizen/urgent-cases/" method="GET">
+                <button type="submit" class="option-btn">Urgent Cases</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

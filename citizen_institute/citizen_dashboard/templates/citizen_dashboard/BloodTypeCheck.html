@@ -1,69 +1,139 @@
-<form method="POST">
-    {% csrf_token %}
-
-    <label for="citizen_name">Full Name:</label>
-    <input type="text" id="citizen_name" name="citizen_name" required>
-
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
-
-    <label for="city">Select City:</label>
-    <select id="city" name="city" required onchange="updateHospitals()">
-        <option value="">Select City</option>
-        <option value="Amman">Amman</option>
-        <option value="Irbid">Irbid</option>
-        <option value="Aqaba">Aqaba</option>
-    </select>
-
-    <label for="hospital">Select Hospital:</label>
-    <select id="hospital" name="hospital" required>
-        <option value="">Select Hospital</option>
-    </select>
-
-    <label for="appointment_date">Select Date and Time:</label>
-    <input type="date" id="appointment_date" name="appointment_date" required>
-
-    <button type="submit">Reserve Appointment</button>
-</form>
-
-<script>
-    const hospitalOptions = {
-        "Amman": ["Khalda Hospital", "Al Khalidi Hospital", "Jordan Hospital"],
-        "Irbid": ["Irbid Specialized Hospital", "Prince Rashid Hospital"],
-        "Aqaba": ["Aqaba Modern Hospital", "Islamic Hospital Aqaba"]
-    };
-
-    function updateHospitals() {
-        const city = document.getElementById("city").value;
-        const hospitalDropdown = document.getElementById("hospital");
-
-        // Clear previous options
-        hospitalDropdown.innerHTML = '<option value="">Select Hospital</option>';
-
-        if (city in hospitalOptions) {
-            hospitalOptions[city].forEach(hospital => {
-                const option = document.createElement("option");
-                option.value = hospital;
-                option.textContent = hospital;
-                hospitalDropdown.appendChild(option);
-            });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Donation Appointment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-    }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #7F0000, #FF4C4C);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 450px;
+            color: #7F0000;
+        }
+        h1 {
+            margin-bottom: 15px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #7F0000;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #7F0000, #FF4C4C);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            margin-top: 15px;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #600000, #D43F3F);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Reserve Your Blood Donation Appointment</h1>
+        <form method="POST">
+            {% csrf_token %}
 
-    // Prevent past date and time selection
-    document.addEventListener("DOMContentLoaded", function () {
-        const appointmentInput = document.getElementById("appointment_date");
-        const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    
-        // Set the minimum selectable date to today
-        appointmentInput.min = today;
-    });
-</script>
+            <label for="citizen_name">Full Name:</label>
+            <input type="text" id="citizen_name" name="citizen_name" required>
 
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="city">Select City:</label>
+            <select id="city" name="city" required onchange="updateHospitals()">
+                <option value="">Select City</option>
+                <option value="Amman">Amman</option>
+                <option value="Irbid">Irbid</option>
+                <option value="Aqaba">Aqaba</option>
+            </select>
+
+            <label for="hospital">Select Hospital:</label>
+            <select id="hospital" name="hospital" required>
+                <option value="">Select Hospital</option>
+            </select>
+
+            <label for="appointment_date">Select Date and Time:</label>
+            <input type="date" id="appointment_date" name="appointment_date" required>
+
+            <button type="submit">Reserve Appointment</button>
+        </form>
+        
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <script>
+        const hospitalOptions = {
+            "Amman": ["Khalda Hospital", "Al Khalidi Hospital", "Jordan Hospital"],
+            "Irbid": ["Irbid Specialized Hospital", "Prince Rashid Hospital"],
+            "Aqaba": ["Aqaba Modern Hospital", "Islamic Hospital Aqaba"]
+        };
+
+        function updateHospitals() {
+            const city = document.getElementById("city").value;
+            const hospitalDropdown = document.getElementById("hospital");
+
+            hospitalDropdown.innerHTML = '<option value="">Select Hospital</option>';
+
+            if (city in hospitalOptions) {
+                hospitalOptions[city].forEach(hospital => {
+                    const option = document.createElement("option");
+                    option.value = hospital;
+                    option.textContent = hospital;
+                    hospitalDropdown.appendChild(option);
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const appointmentInput = document.getElementById("appointment_date");
+            const today = new Date().toISOString().split("T")[0];
+            appointmentInput.min = today;
+        });
+    </script>
+</body>
+</html>
