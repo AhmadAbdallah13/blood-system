@@ -11,6 +11,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 from datetime import datetime
+from accounts.models import Citizen
+from django.contrib.auth.hashers import make_password
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
+
+
+
+
 
 
 
@@ -126,4 +135,39 @@ class BloodDonationAppointmentView(APIView):
                 "appointment_date": str(appointment.appointment_date)
             }
         }, status=201)
-        
+
+
+class SettingsView(View):
+    def get(self, request):
+        email = request.session.get("citizen_email")  # Get email from session
+        if not email:
+            return redirect("login")  # Redirect if no email is found
+
+        try:
+            citizen = Citizen.objects.get(email=email)
+        except Citizen.DoesNotExist:
+            citizen = None
+
+        return render(request, "citizen_dashboard/settings.html", {"citizen": citizen})
+
+    def post(self, request):
+        email = request.session.get("citizen_email")
+        if not email:
+            return redirect("login")  # Ensure the user is known
+
+        citizen = Citizen.objects.get(email=email)
+
+        # Update citizen details
+        citizen.first_name = request.POST.get("first_name")
+        citizen.last_name = request.POST.get("last_name")
+        citizen.phone_number = request.POST.get("phone_number")
+        citizen.blood_type = request.POST.get("blood_type")
+        citizen.city = request.POST.get("city")
+        citizen.address = request.POST.get("address")
+
+        new_password = request.POST.get("password")
+        if new_password:
+            citizen.password = make_password(new_password)
+
+        citizen.save()
+        return redirect("settings")  # Redirect to refresh page

@@ -3,51 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Blood Donation Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to right, #ff6b6b, #c0392b);
+            text-align: center;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            color: black;
+        }
+        h1, h2, h3 {
+            color: #c0392b;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+        }
+        input, button {
+            width: 80%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #c0392b;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #a93226;
+            transform: scale(1.05);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #c0392b;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
 </head>
 <body>
-
-    <h1>Welcome, {{ name }}</h1>
-    <h2>Filter Database</h2>
-
-    <form id="filterForm" method="post">
-        {% csrf_token %}
-        
-        <label for="city">City:</label>
-        <input type="text" id="city" name="city" required>
-
-        <label for="address">Address:</label>
-        <input type="text" id="address" name="address" required>
-
-        <label for="blood_type">Blood Type:</label>
-        <input type="text" id="blood_type" name="blood_type" required>
-
-        <button type="submit">Submit</button> <br> <br>
-
-
-        <label for="urgent">Add this case to the urgent list:</label>
-        <button type="button" id="urgent">Add to urgent list</button>
-    </form>
-
-    <h3>Results:</h3>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>City</th>
-                <th>Address</th>
-                <th>Blood Type</th>
-                <th>Phone Number</th>
-            </tr>
-        </thead>
-        <tbody id="resultsTable">
-        </tbody>
-    </table>
-
+    <div class="container">
+        <h1>Welcome, {{ name }}</h1>
+        <h2>Filter Database</h2>
+        <form id="filterForm" method="post">
+            {% csrf_token %}
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" required>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required>
+            <label for="blood_type">Blood Type:</label>
+            <input type="text" id="blood_type" name="blood_type" required>
+            <button type="submit">Submit</button> <br> <br>
+            <label for="urgent">Add this case to the urgent list:</label>
+            <button type="button" id="urgent">Add to urgent list</button>
+        </form>
+        <h3>Results:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>City</th>
+                    <th>Address</th>
+                    <th>Blood Type</th>
+                    <th>Phone Number</th>
+                </tr>
+            </thead>
+            <tbody id="resultsTable">
+            </tbody>
+        </table>
+    </div>
+    
     <script>
         document.getElementById("filterForm").addEventListener("submit", function(event) {
-            event.preventDefault();  // Prevent normal form submission
+            event.preventDefault();  
 
             const formData = {
                 city: document.getElementById("city").value.trim(),
@@ -60,7 +121,6 @@
                 return;
             }
 
-            // Get CSRF token from the form
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
             fetch("/institute/filter_citizens/", {
@@ -71,21 +131,14 @@
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 const tableBody = document.getElementById("resultsTable");
-                tableBody.innerHTML = ""; // Clear previous results
-
+                tableBody.innerHTML = "";
                 if (data.length === 0) {
                     tableBody.innerHTML = "<tr><td colspan='6'>No results found.</td></tr>";
                     return;
                 }
-
                 data.forEach(row => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -108,7 +161,6 @@
         document.getElementById("urgent").addEventListener("click", function(event) {
             event.preventDefault();  
             window.location.href = "{% url 'description_case' %}";
-
         });
     </script>
 </body>

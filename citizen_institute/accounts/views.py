@@ -9,9 +9,24 @@ from .serializers import CitizenSerializer, InstituteSerializer
 from django.views import View
 from django.views.generic import TemplateView
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
 
+# Custom decorators for auth checks
+def citizen_login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('citizen_id'):
+            messages.error(request, "Please login first!")
+            return redirect('citizen_signin')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
-
+def institute_login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.session.get('institute_id'):
+            messages.error(request, "Please login first!")
+            return redirect('institute_signin')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 ### TEMPLATE-BASED VIEWS ###
 
@@ -38,9 +53,9 @@ class CitizenSignupView(View):
             messages.error(request, "Passwords do not match!")
             return redirect('citizen_signup')
 
-        if Citizen.objects.filter(national_id=national_id).exists() or \
-           Citizen.objects.filter(email=email).exists() or \
-           Citizen.objects.filter(phone_number=phone_number).exists():
+        if (Citizen.objects.filter(national_id=national_id).exists() or
+            Citizen.objects.filter(email=email).exists() or
+            Citizen.objects.filter(phone_number=phone_number).exists()):
             messages.error(request, "National ID, Email, or Phone number already exists!")
             return redirect('citizen_signup')
 
@@ -63,52 +78,75 @@ class CitizenSigninView(View):
         return render(request, 'accounts/citizen_signin.html')
     
     def post(self, request):
-        email = request.POST['email']
-        password = request.POST['password']
+        email = request.POST.get('email')  # Changed to get()
+        password = request.POST.get('password')
         
+        if not email or not password:  # Added validation
+            messages.error(request, "Please fill in all fields")
+            return redirect('citizen_signin')
+
         try:
             citizen = Citizen.objects.get(email=email)
             if check_password(password, citizen.password):
+                request.session['citizen_id'] = citizen.id
+                request.session['citizen_email'] = citizen.email
+                request.session['first_name'] = citizen.first_name
+                request.session['last_name'] = citizen.last_name
+                request.session.save()  # Force session save
                 messages.success(request, "Login successful!")
-                return render(request, 'citizen_dashboard/cdashboard.html', {
-                    'first_name': citizen.first_name,
-                    'last_name': citizen.last_name
-                })
-            else:
-                messages.error(request, "Invalid credentials!")
+                return redirect('citizen_dashboard')
+            messages.error(request, "Invalid credentials!")
         except Citizen.DoesNotExist:
             messages.error(request, "User not found!")
         return redirect('citizen_signin')
-    
+
+@method_decorator(citizen_login_required, name='dispatch')
 class CitizenDashboardView(View):
     def get(self, request):
-        first_name = request.session.get('first_name', 'Guest')
-        last_name = request.session.get('last_name', '')
-        return render(request, 'citizen_dashboard/cdashboard.html', {'first_name': first_name, 'last_name': last_name})
+        try:
+            citizen = Citizen.objects.get(id=request.session['citizen_id'])
+            return render(request, 'citizen_dashboard/cdashboard.html', {
+                'first_name': citizen.first_name,
+                'last_name': citizen.last_name
+            })
+        except Citizen.DoesNotExist:
+            messages.error(request, "Session expired!")
+            return redirect('citizen_signin')
 
+class CitizenLogoutView(View):
+    def get(self, request):
+        request.session.flush()  # Complete session cleanup
+        messages.success(request, "Logged out successfully!")
+        return redirect('citizen_signin')
 
 class InstituteSignupView(View):
     def get(self, request):
         return render(request, 'accounts/institute_signup.html')
     
     def post(self, request):
-        name = request.POST['name']
-        institute_type = request.POST['institute_type']
-        phone_number = request.POST['phone_number']
-        email = request.POST['email']
-        city = request.POST['city']
-        address = request.POST['address']
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
-        
+        name = request.POST.get('name')
+        institute_type = request.POST.get('institute_type')
+        phone_number = request.POST.get('phone_number')
+        email = request.POST.get('email')
+        city = request.POST.get('city')
+        address = request.POST.get('address')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
         if password != confirm_password:
             messages.error(request, "Passwords do not match!")
             return redirect('institute_signup')
-        
+
+        if (Institute.objects.filter(name=name).exists() or
+            Institute.objects.filter(email=email).exists() or
+            Institute.objects.filter(phone_number=phone_number).exists()):
+            messages.error(request, "Institute name, email, or phone number already exists!")
+            return redirect('institute_signup')
+
         Institute.objects.create(
             name=name,
             institute_type=institute_type,
-            phone_number=phone_number,
+            phone_number=phone_number or None,
             email=email,
             city=city,
             address=address,
@@ -122,27 +160,44 @@ class InstituteSigninView(View):
         return render(request, 'accounts/institute_signin.html')
     
     def post(self, request):
-        email = request.POST['email']
-        password = request.POST['password']
+        email = request.POST.get('email')  # Changed to get()
+        password = request.POST.get('password')
         
+        if not email or not password:  # Added validation
+            messages.error(request, "Please fill in all fields")
+            return redirect('institute_signin')
+
         try:
             institute = Institute.objects.get(email=email)
             if check_password(password, institute.password):
+                request.session['institute_id'] = institute.id
+                request.session['institute_email'] = institute.email
+                request.session['name'] = institute.name
+                request.session.save()  # Force session save
                 messages.success(request, "Login successful!")
-                return render(request, 'institute_dashboard/dashboard.html', {
-                    'name': institute.name,    
-                })
-            else:
-                messages.error(request, "Invalid credentials!")
+                return redirect('institute_dashboard')
+            messages.error(request, "Invalid credentials!")
         except Institute.DoesNotExist:
-            messages.error(request, "User not found!")
+            messages.error(request, "Institute not found!")
         return redirect('institute_signin')
-    
+
+@method_decorator(institute_login_required, name='dispatch')
 class InstituteDashboardView(View):
     def get(self, request):
-        name = request.session.get('name', 'Guest')
-        return render(request, 'institute_dashboard/dashboard.html', {'name': name})
+        try:
+            institute = Institute.objects.get(id=request.session['institute_id'])
+            return render(request, 'institute_dashboard/dashboard.html', {
+                'name': institute.name
+            })
+        except Institute.DoesNotExist:
+            messages.error(request, "Session expired!")
+            return redirect('institute_signin')
 
+class InstituteLogoutView(View):
+    def get(self, request):
+        request.session.flush()  # Complete session cleanup
+        messages.success(request, "Logged out successfully!")
+        return redirect('institute_signin')
 ### REST API VIEWS ###
 
 
