@@ -62,8 +62,15 @@
     </style>
 </head>
 <body>
+   
+
     <div class="container">
         <h1>Welcome, {{ first_name }} {{ last_name }}</h1>
+
+        <form action="/citizen/settings/" method="GET">
+            <button type="submit" class="option=btn"> click to change your data</button>
+        </form>
+        
         <p>Select an option:</p>
 
         <div class="button-container">

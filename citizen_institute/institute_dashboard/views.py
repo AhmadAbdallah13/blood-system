@@ -19,6 +19,8 @@ class InstituteDashboardView(TemplateView):
     
 class DescriptionCaseView(TemplateView):
     template_name = "institute_dashboard/description_case.html"
+    
+    
 
     def get(self, request):
         return self.render_to_response({})
