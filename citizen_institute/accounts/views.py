@@ -10,6 +10,13 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
+from .forms import CitizenSignupForm 
+from django.views.generic.edit import FormView
+from .forms import InstituteSignupForm
+from django.urls import reverse_lazy
+
+
+
 
 # Custom decorators for auth checks
 def citizen_login_required(view_func):
@@ -33,45 +40,30 @@ def institute_login_required(view_func):
 class IndexView(TemplateView):
     template_name = "index.html"
 
-class CitizenSignupView(View):
-    def get(self, request):
-        return render(request, 'accounts/citizen_signup.html')
-    
-    def post(self, request):
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        national_id = request.POST.get('national_id')
-        email = request.POST.get('email')
-        phone_number = request.POST.get('phone_number')
-        blood_type = request.POST.get('blood_type')
-        city = request.POST.get('city')
-        address = request.POST.get('address')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+class CitizenSignupView(FormView):
+    template_name = 'accounts/citizen_signup.html'
+    form_class = CitizenSignupForm
+    success_url = '/citizen/signin/'  # Adjust as needed
 
-        if password != confirm_password:
-            messages.error(request, "Passwords do not match!")
-            return redirect('citizen_signup')
-
-        if (Citizen.objects.filter(national_id=national_id).exists() or
-            Citizen.objects.filter(email=email).exists() or
-            Citizen.objects.filter(phone_number=phone_number).exists()):
-            messages.error(request, "National ID, Email, or Phone number already exists!")
-            return redirect('citizen_signup')
-
+    def form_valid(self, form):
+        # Save the citizen to the database
         Citizen.objects.create(
-            first_name=first_name,
-            last_name=last_name,
-            national_id=national_id,
-            email=email,
-            phone_number=phone_number or None,
-            blood_type=blood_type,
-            city=city,
-            address=address,
-            password=make_password(password)
+            first_name=form.cleaned_data['first_name'],
+            last_name=form.cleaned_data['last_name'],
+            national_id=form.cleaned_data['national_id'],
+            email=form.cleaned_data['email'],
+            phone_number=form.cleaned_data['phone_number'] or None,
+            blood_type=form.cleaned_data['blood_type'],
+            city=form.cleaned_data['city'],
+            address=form.cleaned_data['address'],
+            password=make_password(form.cleaned_data['password']),
         )
-        messages.success(request, "Account created successfully! Please sign in.")
-        return redirect('citizen_signin')
+        messages.success(self.request, "Account created successfully! Please sign in.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Please correct the errors below.")
+        return self.render_to_response(self.get_context_data(form=form))
 
 class CitizenSigninView(View):
     def get(self, request):
@@ -119,41 +111,38 @@ class CitizenLogoutView(View):
         messages.success(request, "Logged out successfully!")
         return redirect('citizen_signin')
 
-class InstituteSignupView(View):
-    def get(self, request):
-        return render(request, 'accounts/institute_signup.html')
-    
-    def post(self, request):
-        name = request.POST.get('name')
-        institute_type = request.POST.get('institute_type')
-        phone_number = request.POST.get('phone_number')
-        email = request.POST.get('email')
-        city = request.POST.get('city')
-        address = request.POST.get('address')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+class InstituteSignupView(FormView):
+    template_name = 'accounts/institute_signup.html'
+    form_class = InstituteSignupForm
+    success_url = reverse_lazy('institute_signin')
 
+    def form_valid(self, form):
+        # Check if passwords match
+        password = form.cleaned_data['password']
+        confirm_password = form.cleaned_data['confirm_password']
         if password != confirm_password:
-            messages.error(request, "Passwords do not match!")
+            messages.error(self.request, "Passwords do not match!")
             return redirect('institute_signup')
 
-        if (Institute.objects.filter(name=name).exists() or
-            Institute.objects.filter(email=email).exists() or
-            Institute.objects.filter(phone_number=phone_number).exists()):
-            messages.error(request, "Institute name, email, or phone number already exists!")
+        # Check for duplicate entries
+        if (Institute.objects.filter(name=form.cleaned_data['name']).exists() or
+            Institute.objects.filter(email=form.cleaned_data['email']).exists() or
+            Institute.objects.filter(phone_number=form.cleaned_data['phone_number']).exists()):
+            messages.error(self.request, "Institute name, email, or phone number already exists!")
             return redirect('institute_signup')
 
+        # Create institute
         Institute.objects.create(
-            name=name,
-            institute_type=institute_type,
-            phone_number=phone_number or None,
-            email=email,
-            city=city,
-            address=address,
+            name=form.cleaned_data['name'],
+            institute_type=form.cleaned_data['institute_type'],
+            phone_number=form.cleaned_data['phone_number'] or None,
+            email=form.cleaned_data['email'],
+            city=form.cleaned_data['city'],
+            address=form.cleaned_data['address'],
             password=make_password(password)
         )
-        messages.success(request, "Account created successfully! Please sign in.")
-        return redirect('institute_signin')
+        messages.success(self.request, "Account created successfully! Please sign in.")
+        return super().form_valid(form)
 
 class InstituteSigninView(View):
     def get(self, request):
@@ -262,3 +251,89 @@ class InstituteSigninAPI(APIView):
                 return JsonResponse({"error": "Invalid credentials!"}, status=status.HTTP_401_UNAUTHORIZED, safe=False)
         except Institute.DoesNotExist:
             return JsonResponse({"error": "User not found!"}, status=status.HTTP_404_NOT_FOUND, safe=False)
+        
+        
+        
+#-------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------
+        
+        # Citizen APIs
+
+class CitizenSignupAPI(APIView):
+    def post(self, request):
+        data = request.data
+        if data['password'] != data['confirm_password']:
+            return Response({"error": "Passwords do not match!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if Citizen.objects.filter(national_id=data['national_id']).exists() or \
+           Citizen.objects.filter(email=data['email']).exists() or \
+           Citizen.objects.filter(phone_number=data['phone_number']).exists():
+            return Response({"error": "National ID, Email, or Phone number already exists!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        data['password'] = make_password(data['password'])
+        citizen = Citizen.objects.create(**data)
+        return Response(CitizenSerializer(citizen).data, status=status.HTTP_201_CREATED)
+
+class CitizenSigninAPI(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        citizen = get_object_or_404(Citizen, email=email)
+        
+        if check_password(password, citizen.password):
+            request.session['citizen_id'] = citizen.id
+            request.session['citizen_email'] = citizen.email
+            return Response({"message": "Login successful!"}, status=status.HTTP_200_OK)
+        return Response({"error": "Invalid credentials!"}, status=status.HTTP_400_BAD_REQUEST)
+
+class CitizenDashboardAPI(APIView):
+    @citizen_login_required
+    def get(self, request):
+        citizen = get_object_or_404(Citizen, id=request.session['citizen_id'])
+        return Response(CitizenSerializer(citizen).data, status=status.HTTP_200_OK)
+
+class CitizenLogoutAPI(APIView):
+    def post(self, request):
+        request.session.flush()
+        return Response({"message": "Logged out successfully!"}, status=status.HTTP_200_OK)
+
+# Institute APIs
+
+class InstituteSignupAPI(APIView):
+    def post(self, request):
+        data = request.data
+        if data['password'] != data['confirm_password']:
+            return Response({"error": "Passwords do not match!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if Institute.objects.filter(name=data['name']).exists() or \
+           Institute.objects.filter(email=data['email']).exists() or \
+           Institute.objects.filter(phone_number=data['phone_number']).exists():
+            return Response({"error": "Institute name, email, or phone number already exists!"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        data['password'] = make_password(data['password'])
+        institute = Institute.objects.create(**data)
+        return Response(InstituteSerializer(institute).data, status=status.HTTP_201_CREATED)
+
+class InstituteSigninAPI(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        institute = get_object_or_404(Institute, email=email)
+        
+        if check_password(password, institute.password):
+            request.session['institute_id'] = institute.id
+            request.session['institute_email'] = institute.email
+            return Response({"message": "Login successful!"}, status=status.HTTP_200_OK)
+        return Response({"error": "Invalid credentials!"}, status=status.HTTP_400_BAD_REQUEST)
+
+class InstituteDashboardAPI(APIView):
+    @institute_login_required
+    def get(self, request):
+        institute = get_object_or_404(Institute, id=request.session['institute_id'])
+        return Response(InstituteSerializer(institute).data, status=status.HTTP_200_OK)
+
+class InstituteLogoutAPI(APIView):
+    def post(self, request):
+        request.session.flush()
+        return Response({"message": "Logged out successfully!"}, status=status.HTTP_200_OK)
