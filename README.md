@@ -49,7 +49,6 @@ The **Blood Donation System** is a national humanitarian platform designed to fa
   Institutes can mark a case as urgent and post it on the citizens' urgent cases section, ensuring quick response to critical blood needs across Jordan.
 
 ## Frameworks
-The system is built using **Python Django** along with the following technologies:
 - Django Framework
 - Django REST Framework
 - Docker
