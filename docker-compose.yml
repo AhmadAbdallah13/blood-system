@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: blood_system
+      MYSQL_USER: kareem
+      MYSQL_PASSWORD: Kareem@123
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql  # Persistent MySQL data
+
+  web:
+    build: .
+    container_name: django_app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./citizen_institute:/app  # Ensure the correct project directory is mounted
+    environment:
+      - DB_HOST=db
+      - DB_NAME=blood_system
+      - DB_USER=kareem
+      - DB_PASSWORD=Kareem@123
+
+volumes:
+  mysql_data:

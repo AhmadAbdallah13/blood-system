@@ -88,13 +88,17 @@ WSGI_APPLICATION = 'citizen_institute.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+import os
+
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blood_system',
-        'USER': 'kareem',
-        'PASSWORD': 'Kareem@123',
-        'HOST': 'localhost',
+        'NAME': os.getenv('DB_NAME', 'blood_system'),
+        'USER': os.getenv('DB_USER', 'kareem'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Kareem@123'),
+        'HOST': os.getenv('DB_HOST', 'mysql_db'),  # Change 'localhost' to 'mysql_db'
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
